@@ -1,42 +1,38 @@
-const ERC20 = artifacts.require("ERC20");
+const NeoToken = artifacts.require("NeoToken");
 
-contract("ERC20 Develope", accounts => {
-    let _ERC20;
+contract("NeoToken Develope", accounts => {
+    let _NeoToken;
     before(async () => {
-        _ERC20 = await ERC20.deployed();
-        console.log(_ERC20.address);
+        _NeoToken = await NeoToken.deployed();
+        console.log(_NeoToken.address);
     });
 
 
-    it("Should deployed NFT Market Place properly.", async () => {
-        assert(_ERC20.address !== '');
+    it("Should deployed NeoToken properly.", async () => {
+        assert(_NeoToken.address !== '');
     })
 
-    it("Name and Symbol of token should be correct", async () => {
-        let _nameToken= await _ERC20.name({from: accounts[1]});
-        let _symbolToken= await _ERC20.symbol({from: accounts[1]});
-        assert(_nameToken == "Neo");
-        assert(_symbolToken == "NS");
+    it("Name, Symbol and Total Supply of token should be correct", async () => {
+        let _nameToken= await _NeoToken.name({from: accounts[0]});
+        let _symbolToken= await _NeoToken.symbol({from: accounts[0]});
+        let _totalSupply= await _NeoToken.totalSupply({from: accounts[0]});
+        assert(_nameToken == "NeoToken");
+        assert(_symbolToken == "NT");
+        assert(_totalSupply == 100000);
     })
 
-    it("owner token mint supply should be 10000", async () => {
-        await _ERC20.mint(10000, {from: accounts[1]});
-        let _totalSupply= await _ERC20.totalSupply({from: accounts[1]});
-        assert(_totalSupply == 10000);
-    })
+    // it("balance of accounts[0] should be 100000", async () => {
+    //     let _balanceOf= await _NeoToken.balanceOf(accounts[0]);
+    //     assert(_balanceOf == 100000);
+    // })
 
-    it("balance of", async () => {
-        let _totalSupply= await _ERC20.balanceOf(accounts[1]);
-        assert(_totalSupply == 10000);
-    })
-
-    it("transfer balance ", async () => {
-        let result= await _ERC20.transfer(accounts[0],1000,{from: accounts[1]});
+    it("transfer balance 1000 Neo from accounts[0] to accounts[1]", async () => {
+        let result= await _NeoToken.transfer(accounts[1],1000,{from: accounts[0]});
         assert(result.logs[0].event == "Transfer");
     })   
 
-    it("balance of", async () => {
-        let _totalSupply= await _ERC20.balanceOf(accounts[0]);
+    it("balance of accounts[1] should be 1000", async () => {
+        let _totalSupply= await _NeoToken.balanceOf(accounts[1]);
         assert(_totalSupply == 1000);
     })
 
