@@ -1,5 +1,5 @@
 const DeFi = artifacts.require("DeFi");
 
 module.exports = function (deployer) {
-  deployer.deploy(DeFi);
+  deployer.deploy(DeFi,"NeoToken", "NT");
 };
