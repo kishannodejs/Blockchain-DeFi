@@ -4,9 +4,16 @@ pragma solidity ^0.8.0;
 import "../ERC20/Ownable.sol";
 import "../ERC20/ERC20.sol";
 
-contract LPT is ERC20, Ownable{
+contract LPT is ERC20, Ownable {
+    address lpAddress;
 
-    constructor(address _lpAddress) ERC20("Liquidity Pool Token", "LPT") {
+    constructor(string memory _name, string memory _symbol)
+        ERC20(_name, _symbol)
+    {}
+
+    function setLPAddress(address _lpAddress) external onlyOwner {
+        require(lpAddress == address(0), "Write Once");
+        lpAddress = _lpAddress;
         transferOwnership(_lpAddress);
     }
 
@@ -17,5 +24,4 @@ contract LPT is ERC20, Ownable{
     function burn(address account, uint256 amount) external onlyOwner {
         _burn(account, amount);
     }
-
 }

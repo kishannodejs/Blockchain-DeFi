@@ -13,7 +13,7 @@ contract LiquidityPool is Ownable {
     event TokensTrade(
         address indexed _account,
         uint256 _ethTraded,
-        uint256 _NeoTraded
+        uint256 _neoTraded
     );
 
     LPT lpToken;
@@ -35,16 +35,32 @@ contract LiquidityPool is Ownable {
         return (ethReserve, neoReserve);
     }
 
-    function swap(uint256 _neoToken) external payable {
+    function swap(address _account, uint256 _neoAmnt) external payable {
         uint256 product = ethReserve * neoReserve;
         uint256 amountToTransfer;
 
         if (msg.value == 0) {
             uint256 currentNeoBalance = neoToken.balanceOf(address(this));
-        } else {}
+            uint256 addedBalance = neoReserve + _neoAmnt;
+
+            require(addedBalance == currentNeoBalance, "Did_Not_Transfer");
+
+            uint256 x = product / (currentNeoBalance);
+            amountToTransfer = ethReserve - x;
+
+            (bool sucess, ) = _account.call{value: amountToTransfer}("");
+            require(sucess, "Transfer_Failed");
+        } else {
+            uint256 y = product / (ethReserve + msg.value);
+            amountToTransfer = neoReserve - y;
+
+            neoToken.transfer(_account, amountToTransfer);
+        }
+        emit TokensTrade(_account, msg.value, _neoAmnt);
+        _update();
     }
 
-    function deposit(uint256 _neoToken, address _account) external payable {
+    function deposit(uint256 _neoAmnt, address _account) external payable {
         uint256 liquidity;
         uint256 totaSupply = lpToken.balanceOf(_account);
         uint256 ethAmnt = msg.value;
@@ -52,24 +68,24 @@ contract LiquidityPool is Ownable {
         if (totaSupply > 0) {
             liquidity = Math.min(
                 (ethAmnt * totaSupply) / ethReserve,
-                (_neoToken * totaSupply) / neoReserve
+                (_neoAmnt * totaSupply) / neoReserve
             );
         } else {
-            liquidity = Math.sqrt(ethAmnt * _neoToken);
+            liquidity = Math.sqrt(ethAmnt * _neoAmnt);
         }
         lpToken.mint(_account, liquidity);
         emit LiquidityAdded(_account);
         _update();
     }
 
-    function withdraw(address _account)external {
-        uint liquidity = lpToken.balanceOf(_account);
+    function withdraw(address _account) external {
+        uint256 liquidity = lpToken.balanceOf(_account);
         require(liquidity != 0, "NO_AVAILABLE_TOKENS");
 
-        uint totalSupply= lpToken.totalSupply();
+        uint256 totalSupply = lpToken.totalSupply();
 
-        uint ethAmnt = (ethReserve * liquidity) / totalSupply;
-        uint neoAmnt = (neoReserve * liquidity) / totalSupply;
+        uint256 ethAmnt = (ethReserve * liquidity) / totalSupply;
+        uint256 neoAmnt = (neoReserve * liquidity) / totalSupply;
 
         lpToken.burn(_account, liquidity);
         (bool ethTransferSuccess, ) = _account.call{value: ethAmnt}("");
