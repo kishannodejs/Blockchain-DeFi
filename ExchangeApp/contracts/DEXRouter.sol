@@ -7,9 +7,9 @@ import "../ERC20/Ownable.sol";
 
 contract DEXRouter is Ownable {
     //instance of Neo Token contract
-    NeoToken neoToken;
+    NeoToken public neoToken;
     //instance of LiquidityPool contract
-    LiquidityPool liquidityPool;
+    LiquidityPool public liquidityPool;
 
     /***
      *@notice set the Liquidity Pool contract address to Router

@@ -33,9 +33,9 @@ contract LiquidityPool is Ownable {
     );
 
     //instance of LPToken contract 
-    LPT lpToken;
+    LPT public lpToken;
     //instance of Neo Token contract
-    NeoToken neoToken;
+    NeoToken public neoToken;
     //ETH Reserve of the liquidity pool
     uint256 ethReserve;
     //Neo Token Reserve of liquidity pool
